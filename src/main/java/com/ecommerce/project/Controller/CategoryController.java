@@ -1,39 +1,37 @@
 package com.ecommerce.project.Controller;
 
 import com.ecommerce.project.Model.Category;
-import com.ecommerce.project.Service.CateGoryService;
+import com.ecommerce.project.Service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 public class CategoryController {
 
     @Autowired
-    private CateGoryService cateGoryService;
+    private CategoryService categoryService;
     @GetMapping("/api/public/categories")
     public ResponseEntity<List<Category>> getAllCategory(){
-        List<Category> categories = cateGoryService.getAllCategory();
+        List<Category> categories = categoryService.getAllCategory();
         return new ResponseEntity<>(categories,HttpStatus.OK);
     }
 
 
     @PostMapping("/api/public/categories")
-    public ResponseEntity<String> CateGory (@RequestBody Category category){
-        cateGoryService.createCategory(category);
-        String CateGoryBody = "CateGory added successful";
-        return new ResponseEntity<>(CateGoryBody,HttpStatus.CREATED);
+    public ResponseEntity<String> createCateGory (@RequestBody Category category){
+        categoryService.createCategory(category);
+        return new ResponseEntity<>("CateGory added successful",HttpStatus.CREATED);
     }
 
     @DeleteMapping("/api/admin/categories/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId){
         try {
-            String status = cateGoryService.deleteCategory(categoryId);
+            String status = categoryService.deleteCategory(categoryId);
             return new ResponseEntity<>(status,HttpStatus.OK);
         }catch (ResponseStatusException e){
             return new ResponseEntity<>(e.getReason(),e.getStatusCode());
@@ -44,8 +42,8 @@ public class CategoryController {
     public ResponseEntity<String> updateCategory(@RequestBody Category category ,
                                                  @PathVariable Long categoryId){
        try {
-           Category saveCategory = cateGoryService.updateCategory(category,categoryId);
-           return new ResponseEntity<>("CateGory with CategoryId" + category,HttpStatus.OK);
+           Category saveCategory = categoryService.updateCategory(category,categoryId);
+           return new ResponseEntity<>("CateGory with CategoryId" + categoryId,HttpStatus.OK);
        }catch (ResponseStatusException e){
            return new ResponseEntity<>(e.getReason(),e.getStatusCode());
        }

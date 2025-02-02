@@ -1,50 +1,58 @@
 package com.ecommerce.project.Service;
 
 import com.ecommerce.project.Model.Category;
+import com.ecommerce.project.Repository.CategoryRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class CategoryServiceImpl implements CateGoryService{
-    private List<Category> categories = new ArrayList<>();
+public class CategoryServiceImpl implements CategoryService {
+    //private Long nextId = 1L;
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private EntityManager entityManager;
     @Override
     public List<Category> getAllCategory() {
-        return categories;
+        return categoryRepository.findAll();
     }
 
+    //@Transactional
     @Override
     public void createCategory(Category category) {
-        categories.add(category);
+        //category.setCategoryId(nextId++);
+//        if (!entityManager.contains(category)) {
+//            category = entityManager.merge(category);  // 合併分離的實體
+//        }
+        categoryRepository.save(category);
     }
+
 
     @Override
     public String deleteCategory(Long categoryId) {
-        Category category = categories.stream()
-                .filter(category1 -> category1.getCategoryId().equals(categoryId))
-                .findFirst()
+        Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Resource not found"));
-
-        categories.remove(category);
-        return categoryId + " is delete successful";
+        categoryRepository.delete(category);
+        return categoryId +":" + category.getCategoryName()+ " is delete successful";
     }
+
 
     @Override
     public Category updateCategory(Category category, Long categoryId) {
-        Optional<Category> optionalCategory = categories.stream()
-                .filter(category1 -> category1.getCategoryId().equals(categoryId))
-                .findFirst();
-        if (optionalCategory.isPresent()){
-            Category existingCategory = optionalCategory.get();
-            existingCategory.setCategoryName(category.getCategoryName());
-            return existingCategory;
-        }else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Category not found");
-        }
+        //逐個資料尋找，有需要時再拋出異常
+        Category savedCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Category is not find"));
+        //將類別儲存回資料庫中
+        category.setCategoryId(categoryId);
+        savedCategory = categoryRepository.save(category);
+        return savedCategory;
     }
 
 
