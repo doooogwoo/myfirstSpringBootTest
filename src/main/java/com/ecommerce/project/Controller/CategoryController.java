@@ -17,15 +17,17 @@ public class CategoryController {
     @Autowired
     private CateGoryService cateGoryService;
     @GetMapping("/api/public/categories")
-    public List<Category> getAllCategory(){
-        return cateGoryService.getAllCategory();
+    public ResponseEntity<List<Category>> getAllCategory(){
+        List<Category> categories = cateGoryService.getAllCategory();
+        return new ResponseEntity<>(categories,HttpStatus.OK);
     }
 
 
     @PostMapping("/api/public/categories")
-    public String CateGory (@RequestBody Category category){
+    public ResponseEntity<String> CateGory (@RequestBody Category category){
         cateGoryService.createCategory(category);
-        return "CateGory added successful";
+        String CateGoryBody = "CateGory added successful";
+        return new ResponseEntity<>(CateGoryBody,HttpStatus.CREATED);
     }
 
     @DeleteMapping("/api/admin/categories/{categoryId}")
