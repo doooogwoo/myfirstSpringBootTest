@@ -1,10 +1,14 @@
 package com.ecommerce.project.Service;
 
 import com.ecommerce.project.Model.Category;
+import com.ecommerce.project.Payload.CategoryDto;
+import com.ecommerce.project.Payload.CategoryResponse;
 import com.ecommerce.project.Repository.CategoryRepository;
 import com.ecommerce.project.exceptions.APIException;
 import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityManager;
+import org.apache.catalina.mapper.Mapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,13 +22,21 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
     private EntityManager entityManager;
     @Override
-    public List<Category> getAllCategory() {
+    public CategoryResponse getAllCategory() {
         List<Category> categories = categoryRepository.findAll();
         if (categories.isEmpty())
             throw new APIException("No category create till now");
-        return categories;
+        List<CategoryDto> categoryDTOs = categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDto.class))
+                .toList();
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(categoryDTOs);
+        return categoryResponse;
     }
 
     //@Transactional
