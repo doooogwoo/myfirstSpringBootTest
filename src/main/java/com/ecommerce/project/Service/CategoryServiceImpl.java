@@ -27,10 +27,6 @@ public class CategoryServiceImpl implements CategoryService {
     //@Transactional
     @Override
     public void createCategory(Category category) {
-        //category.setCategoryId(nextId++);
-//        if (!entityManager.contains(category)) {
-//            category = entityManager.merge(category);  // 合併分離的實體
-//        }
         categoryRepository.save(category);
     }
 
