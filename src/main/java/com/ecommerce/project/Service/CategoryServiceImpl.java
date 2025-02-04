@@ -2,10 +2,10 @@ package com.ecommerce.project.Service;
 
 import com.ecommerce.project.Model.Category;
 import com.ecommerce.project.Repository.CategoryRepository;
+import com.ecommerce.project.exceptions.APIException;
+import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,12 +21,18 @@ public class CategoryServiceImpl implements CategoryService {
     private EntityManager entityManager;
     @Override
     public List<Category> getAllCategory() {
-        return categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
+        if (categories.isEmpty())
+            throw new APIException("No category create till now");
+        return categories;
     }
 
     //@Transactional
     @Override
     public void createCategory(Category category) {
+        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
+        if (savedCategory != null)
+            throw new APIException("CateGory name with: " + category.getCategoryName() + " is already exists");
         categoryRepository.save(category);
     }
 
@@ -34,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public String deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Resource not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Category","CategoryId",categoryId));
         categoryRepository.delete(category);
         return categoryId +":" + category.getCategoryName()+ " is delete successful";
     }
@@ -44,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category updateCategory(Category category, Long categoryId) {
         //逐個資料尋找，有需要時再拋出異常
         Category savedCategory = categoryRepository.findById(categoryId)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Category is not find"));
+                .orElseThrow(()-> new ResourceNotFoundException("Category","CategoryId",categoryId));
         //將類別儲存回資料庫中
         category.setCategoryId(categoryId);
         savedCategory = categoryRepository.save(category);
