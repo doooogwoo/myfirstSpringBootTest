@@ -1,5 +1,6 @@
 package com.ecommerce.project.Controller;
 
+import com.ecommerce.project.Config.AppConstants;
 import com.ecommerce.project.Payload.CategoryDto;
 import com.ecommerce.project.Payload.CategoryResponse;
 import com.ecommerce.project.Service.CategoryService;
@@ -24,8 +25,8 @@ public class CategoryController {
 
     @GetMapping("/public/categories")
     public ResponseEntity<CategoryResponse> getAllCategory(
-            @RequestParam(name = "pageNumber") Integer pageNumber,
-            @RequestParam(name = "pageSize") Integer pageSize)
+            @RequestParam(name = "pageNumber",defaultValue = AppConstants.PAGE_NUMBER,required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize",defaultValue = AppConstants.PAGE_SIZE,required = false) Integer pageSize)
     {
         CategoryResponse categoryResponse = categoryService.getAllCategory(pageNumber,pageSize);
         return new ResponseEntity<>(categoryResponse,HttpStatus.OK);
