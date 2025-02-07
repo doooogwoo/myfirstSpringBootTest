@@ -16,15 +16,18 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping("/echo")                       //要搜索的話可以依靠這個關鍵字
-    public ResponseEntity<String> echoMessage(@RequestParam (name = "message",required = false) String message){
-    //public ResponseEntity<String> echoMessage(@RequestParam (name = "message",defaultValue = "Hello World!") String message)
-        return new ResponseEntity<>("Echo Message: " + message,HttpStatus.OK);
-    }
+//    @GetMapping("/echo")                       //要搜索的話可以依靠這個關鍵字
+//    public ResponseEntity<String> echoMessage(@RequestParam (name = "message",required = false) String message){
+//    //public ResponseEntity<String> echoMessage(@RequestParam (name = "message",defaultValue = "Hello World!") String message)
+//        return new ResponseEntity<>("Echo Message: " + message,HttpStatus.OK);
+//    }
 
     @GetMapping("/public/categories")
-    public ResponseEntity<CategoryResponse> getAllCategory(){
-        CategoryResponse categoryResponse = categoryService.getAllCategory();
+    public ResponseEntity<CategoryResponse> getAllCategory(
+            @RequestParam(name = "pageNumber") Integer pageNumber,
+            @RequestParam(name = "pageSize") Integer pageSize)
+    {
+        CategoryResponse categoryResponse = categoryService.getAllCategory(pageNumber,pageSize);
         return new ResponseEntity<>(categoryResponse,HttpStatus.OK);
     }
 
