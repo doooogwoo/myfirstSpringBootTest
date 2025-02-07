@@ -23,9 +23,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private ModelMapper modelMapper;
-
-    @Autowired
-    private EntityManager entityManager;
     @Override
     public CategoryResponse getAllCategory() {
         List<Category> categories = categoryRepository.findAll();
@@ -39,13 +36,14 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryResponse;
     }
 
-    //@Transactional
     @Override
-    public void createCategory(Category category) {
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
-        if (savedCategory != null)
+    public CategoryDto createCategory(CategoryDto categoryDto) {
+        Category category = modelMapper.map(categoryDto,Category.class);
+        Category categoryFindFromDB = categoryRepository.findByCategoryName(category.getCategoryName());
+        if (categoryFindFromDB != null)
             throw new APIException("CateGory name with: " + category.getCategoryName() + " is already exists");
-        categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        return modelMapper.map(savedCategory,CategoryDto.class);
     }
 
 
@@ -59,14 +57,15 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public Category updateCategory(Category category, Long categoryId) {
+    public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
         //逐個資料尋找，有需要時再拋出異常
         Category savedCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(()-> new ResourceNotFoundException("Category","CategoryId",categoryId));
         //將類別儲存回資料庫中
+        Category category = modelMapper.map(categoryDto,Category.class);
         category.setCategoryId(categoryId);
         savedCategory = categoryRepository.save(category);
-        return savedCategory;
+        return modelMapper.map(savedCategory,CategoryDto.class);
     }
 
 
