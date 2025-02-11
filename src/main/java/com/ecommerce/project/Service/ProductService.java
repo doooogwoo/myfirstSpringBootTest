@@ -9,4 +9,8 @@ public interface ProductService {
     ProductDto addProduct(Long categoryId, Product product);
 
     ProductResponse getProducts();
+
+    ProductResponse searchByCategoryId(Long categoryId);
+
+    ProductResponse searchByKeyword(String keyword);
 }
