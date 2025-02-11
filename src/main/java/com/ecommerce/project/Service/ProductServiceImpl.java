@@ -28,6 +28,7 @@ public class ProductServiceImpl implements ProductService{
                         new ResourceNotFoundException("Category","categoryId",categoryId));
         product.setCategory(category);
         product.setImage("default png");
+        product.setDescription(product.getDescription());
         double specialPrice = product.getPrice()-
                 ((product.getDiscount() * 0.01)) * product.getPrice();
         product.setSpecialPrice(specialPrice);
@@ -68,5 +69,24 @@ public class ProductServiceImpl implements ProductService{
         productResponse.setContent(productDtos);
         return productResponse;
 
+    }
+
+    @Override
+    public ProductDto updateProduct(Long productId, Product product) {
+        //Get the existing product from DB
+        Product productFindFromDB = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product","ProductId",productId));
+        //update the product info with user shared
+        productFindFromDB.setProductName(product.getProductName());
+        productFindFromDB.setDescription(product.getDescription());
+        productFindFromDB.setQuantity(product.getQuantity());
+        productFindFromDB.setDiscount(product.getDiscount());
+        productFindFromDB.setPrice(product.getPrice());
+        productFindFromDB.setSpecialPrice(product.getSpecialPrice());
+
+        //save to database
+        Product saveProduct = productRepository.save(productFindFromDB);
+
+        return modelMapper.map(saveProduct,ProductDto.class);
     }
 }
